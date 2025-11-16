@@ -213,7 +213,8 @@ public class LinkedListTabulatedFunction implements TabulatedFunction, Serializa
             return Double.NaN;
         }
 
-        // Поиск интервала для интерполяции
+        final double EPSILON = 1e-10;
+
         for (int i = 0; i < size - 1; i++) {
             FunctionNode current = getNodeByIndex(i);
             FunctionNode next = current.getNext();
@@ -223,13 +224,24 @@ public class LinkedListTabulatedFunction implements TabulatedFunction, Serializa
             double y1 = current.getPoint().getY();
             double y2 = next.getPoint().getY();
 
+            if (Math.abs(x - x1) < EPSILON) {
+                return y1;
+            }
+            if (Math.abs(x - x2) < EPSILON) {
+                return y2;
+            }
+
             if (x >= x1 && x <= x2) {
-                if (x1 == x2) {
-                    return y1; // Вертикальный отрезок
+                if (Math.abs(x1 - x2) < EPSILON) {
+                    return y1;
                 }
-                // Линейная интерполяция
                 return y1 + (y2 - y1) * (x - x1) / (x2 - x1);
             }
+        }
+
+        FunctionNode lastNode = getNodeByIndex(size - 1);
+        if (Math.abs(x - lastNode.getPoint().getX()) < EPSILON) {
+            return lastNode.getPoint().getY();
         }
 
         return Double.NaN;

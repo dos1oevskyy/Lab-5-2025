@@ -36,7 +36,8 @@ public class FunctionPoint implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FunctionPoint that = (FunctionPoint) o;
-        return Double.compare(that.x, x) == 0 && Double.compare(that.y, y) == 0;
+        final double EPSILON = 1e-10;
+        return Math.abs(that.x - x) < EPSILON && Math.abs(that.y - y) < EPSILON;
     }
     @Override
     public int hashCode() {

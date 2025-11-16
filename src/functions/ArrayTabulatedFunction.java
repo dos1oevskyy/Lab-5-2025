@@ -70,15 +70,31 @@ public class ArrayTabulatedFunction implements TabulatedFunction, Serializable {
     public double getFunctionValue(double x) {
         if (x < getLeftDomainBorder() || x > getRightDomainBorder())
             return Double.NaN;
+
+        final double EPSILON = 1e-10;
+
         for (int i = 0; i < pointsCount - 1; i++) {
             double x1 = points[i].getX();
             double x2 = points[i + 1].getX();
+
+            if (Math.abs(x - x1) < EPSILON) {
+                return points[i].getY();
+            }
+            if (Math.abs(x - x2) < EPSILON) {
+                return points[i + 1].getY();
+            }
+
             if (x >= x1 && x <= x2) {
                 double y1 = points[i].getY();
                 double y2 = points[i + 1].getY();
                 return y1 + ((y2 - y1) * (x - x1)) / (x2 - x1);
             }
         }
+
+        if (Math.abs(x - points[pointsCount - 1].getX()) < EPSILON) {
+            return points[pointsCount - 1].getY();
+        }
+
         return Double.NaN;
     }
     @Override
@@ -254,7 +270,6 @@ public class ArrayTabulatedFunction implements TabulatedFunction, Serializable {
 
             return cloned;
         } catch (CloneNotSupportedException e) {
-            // Эта исключительная ситуация не должна происходить, так как мы реализуем Cloneable
             throw new AssertionError("Клонирование не поддерживается", e);
         }
     }
